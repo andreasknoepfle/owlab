@@ -1,0 +1,42 @@
+- if @owldiff.binary_identical?
+  .row
+    .col-lg-12
+      .alert.alert-success(role="alert")
+        The files are binary identical.
+- else
+  .row
+    .col-lg-6
+      - Owldiff::OntologyDiff::SINGLE_CHANGE_TYPES.each do |change_type|
+        - change =  @owldiff.send("#{change_type}")
+        - if change
+          %h3= label_text_change_type(change_type)
+          %a.change{style: "display:block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", data: { toggle: "popover", html: "true", trigger: "hover", content: format_popover(change.data), placement: "bottom"}}
+            %font{color: style_helper(change.action)}
+              = h change.value
+            %br
+      - Owldiff::OntologyDiff::SET_CHANGE_TYPES.each do |change_type|
+        - changes =  @owldiff.send("#{change_type}")
+        - if changes && !changes.empty?
+          %h3= label_text_change_type(change_type)
+
+          - changes.sort_by(&:value).each do |change|
+            %a.change{style: "display:block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", data: { toggle: "popover", html: "true", trigger: "hover", content: format_popover(change.data), placement: "bottom"}}
+              %font{color: style_helper(change.action)}
+                = h change.value
+              %br
+    .col-lg-6
+      %h3 New Entities
+      - @owldiff.new_entities.each do |entity|
+        .change{style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"}
+          %font{color: "green"}
+            = entity.short
+      %h3 Modified Entities
+      - @owldiff.modified_entities.each do |entity|
+        .change{style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"}
+          %font{color: "blue"}
+            = entity.short
+      %h3 Removed Entities
+      - @owldiff.removed_entities.each do |entity|
+        .change{style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"}
+          %font{color: "red"}
+            = entity.short

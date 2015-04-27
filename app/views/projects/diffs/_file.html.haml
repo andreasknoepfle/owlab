@@ -38,7 +38,13 @@
     -# Skipp all non non-supported blobs
     - return unless blob.respond_to?('text?')
     - if blob.text?
-      - if params[:view] == 'parallel'
+      - if Owlnest::Owldiff.supported_file?(blob.name)
+        - if @commit.parent_id
+          - @owldiff = Owldiff::Client.diff diff_url_for(project,@commit.id,diff_file.file_path), diff_url_for(project,@commit.parent_id,diff_file.file_path)
+          = render "projects/diffs/owldiff"
+        - elsif !blob.empty?
+          = render 'shared/file_highlight', blob: blob
+      - elsif params[:view] == 'parallel'
         = render "projects/diffs/parallel_view", diff_file: diff_file, project: project, blob: blob, index: i
       - else
         = render "projects/diffs/text_file", diff_file: diff_file, index: i
@@ -47,4 +53,3 @@
       = render "projects/diffs/image", diff_file: diff_file, old_file: old_file, file: blob, index: i
     - else
       .nothing-here-block No preview for this file type
-

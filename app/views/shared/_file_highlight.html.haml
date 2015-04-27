@@ -1,6 +1,6 @@
 .file-content.code{class: user_color_scheme_class}
   .line-numbers
-    - if blob.data.present?
+    - if blob.data.present? && !Owlnest::Owldiff.supported_file?(blob.name)
       - blob.data.lines.to_a.size.times do |index|
         - offset = defined?(first_line_number) ? first_line_number : 1
         - i = index + offset
