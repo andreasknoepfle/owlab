@@ -22,7 +22,7 @@
           %span.file-mode= "#{diff_file.diff.a_mode} → #{diff_file.diff.b_mode}"
 
       .diff-btn-group
-        - if blob.text?
+        - if blob.text? && !Owlnest::Owldiff.supported_file?(blob.name)
           = link_to '#', class: 'js-toggle-diff-comments btn btn-sm active has_tooltip', title: "Toggle comments for this file" do
             %i.fa.fa-comments
           &nbsp;
@@ -40,8 +40,8 @@
     - if blob.text?
       - if Owlnest::Owldiff.supported_file?(blob.name)
         - if @commit.parent_id
-          - @owldiff = Owldiff::Client.diff diff_url_for(project,@commit.id,diff_file.file_path), diff_url_for(project,@commit.parent_id,diff_file.file_path)
-          = render "projects/diffs/owldiff"
+          - owldiff = Owldiff::Client.diff diff_url_for(project,@commit.id, diff_file.file_path), diff_url_for(project,@commit.parent_id, diff_file.file_path)
+          = render "projects/diffs/owldiff", owldiff: owldiff
         - elsif !blob.empty?
           = render 'shared/file_highlight', blob: blob
       - elsif params[:view] == 'parallel'

@@ -1,42 +1,56 @@
-- if @owldiff.binary_identical?
-  .row
-    .col-lg-12
-      .alert.alert-success(role="alert")
-        The files are binary identical.
-- else
-  .row
-    .col-lg-6
-      - Owldiff::OntologyDiff::SINGLE_CHANGE_TYPES.each do |change_type|
-        - change =  @owldiff.send("#{change_type}")
-        - if change
-          %h3= label_text_change_type(change_type)
-          %a.change{style: "display:block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", data: { toggle: "popover", html: "true", trigger: "hover", content: format_popover(change.data), placement: "bottom"}}
-            %font{color: style_helper(change.action)}
-              = h change.value
-            %br
-      - Owldiff::OntologyDiff::SET_CHANGE_TYPES.each do |change_type|
-        - changes =  @owldiff.send("#{change_type}")
-        - if changes && !changes.empty?
-          %h3= label_text_change_type(change_type)
+.light-well
+  - if owldiff.format_change
+    .alert.alert-warning
+      %h4
+        %i.fa.fa-exclamation-triangle
+        =  t("owlnest.single_change.format_change.title")
+      = t("owlnest.single_change.format_change.notice", data: owldiff.format_change.data)
+  - if owldiff.ontology_id_change
+    .alert.alert-warning
+      %h4
+        %i.fa.fa-exclamation-triangle
+        =  t("owlnest.single_change.ontology_id_change.title")
+      %table
+        - ["ontology_iri","version_iri"].each do |iri|
+          %tr
+            %td= t("owlnest.single_change.ontology_id_change.#{iri}")
+            %td= owldiff.ontology_id_change.data[iri]
 
-          - changes.sort_by(&:value).each do |change|
-            %a.change{style: "display:block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", data: { toggle: "popover", html: "true", trigger: "hover", content: format_popover(change.data), placement: "bottom"}}
-              %font{color: style_helper(change.action)}
-                = h change.value
-              %br
-    .col-lg-6
-      %h3 New Entities
-      - @owldiff.new_entities.each do |entity|
-        .change{style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"}
-          %font{color: "green"}
-            = entity.short
-      %h3 Modified Entities
-      - @owldiff.modified_entities.each do |entity|
-        .change{style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"}
-          %font{color: "blue"}
-            = entity.short
-      %h3 Removed Entities
-      - @owldiff.removed_entities.each do |entity|
-        .change{style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"}
-          %font{color: "red"}
-            = entity.short
+  - Owldiff::OntologyDiff::SET_CHANGE_TYPES.each do |change_type|
+    - changes =  owldiff.send("#{change_type}")
+    - if changes && !changes.empty?
+      - gchanges = changes.group_by{ |change| change.action}.sort
+      .panel.panel-default
+        .panel-heading
+          = t "owlnest.set_changes.#{change_type}.title"
+        .panel-body{:role => "tabpanel"}
+          %p
+            = t "owlnest.set_changes.#{change_type}.explain"
+          %ul.nav.nav-tabs{:role => "tablist"}
+            - gchanges.each_with_index do |(action,changes),index|
+              %li{:role => "presentation", class: index==0 ? "active" : ""}
+                %a{"aria-controls" => "#{change_type}_#{action}", "data-toggle" => "tab", :href => "##{change_type}_#{action}", :role => "tab"}
+                  %strong{class: owlnest_action_class(action)}
+                    = t "owlnest.actions.#{action}"
+                    %span.badge
+                      = pluralize(changes.size, t("owlnest.set_changes.#{change_type}.name"))
+          .tab-content
+            - gchanges.each_with_index do |(action,changes),index|
+              .tab-pane{:role => "tabpanel", id: "#{change_type}_#{action}", class: index==0 ? "active" : ""}
+                .panel-group{id: "#{change_type}_#{action}_panel"}
+                  .pre-scrollable
+                    - changes.each_with_index do |ochange,index|
+                      .panel
+                        .panel-heading
+                          %a{ class: owlnest_action_class(action), "data-toggle" => "collapse", "data-parent" => "##{change_type}_#{action}_panel" , "aria-controls" => "#{change_type}_#{action}_panel_#{index}" , "href" => "##{change_type}_#{action}_panel_#{index}" }= ochange.value
+                        .panel-collapse.collapse{ id: "#{change_type}_#{action}_panel_#{index}" , role: "tabpanel"}
+                          .panel-body
+                            - if ochange.data.is_a? String
+                              = ochange.data
+                            - else
+                              %dl.dl-horizontal{style: "margin-bottom:0"}
+                                - ochange.data.each do |k,v|
+                                  %dt
+                                    =k
+                                  %dd
+                                    =v
