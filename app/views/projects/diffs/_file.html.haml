@@ -40,8 +40,13 @@
     - if blob.text?
       - if Owlnest::Owldiff.supported_file?(blob.name)
         - if @commit.parent_id
-          - owldiff = Owldiff::Client.diff diff_url_for(project,@commit.id, diff_file.file_path), diff_url_for(project,@commit.parent_id, diff_file.file_path)
-          = render "projects/diffs/owldiff", owldiff: owldiff, index: i
+          .owlnest_owldiff.ajax_pending{data: { file_index: i, parent_url:  diff_url_for(project,@commit.id, diff_file.file_path), child_url: diff_url_for(project,@commit.parent_id, diff_file.file_path) }}
+            .light-well
+              %h4
+                %i.fa.fa-refresh.fa-spin
+                %strong Calculating
+                commit data for ontology diff.
+          =# render "projects/diffs/owldiff", owldiff: owldiff, index: i
         - elsif !blob.empty?
           = render 'shared/file_highlight', blob: blob
       - elsif params[:view] == 'parallel'
