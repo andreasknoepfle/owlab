@@ -1,4 +1,5 @@
 class OwlnestController < ApplicationController
+  skip_before_action :authenticate_user!, only: [:diff]
   def diff
     @owldiff = Owldiff::Client.diff params[:parent_url], params[:child_url]
     @file_index = params[:file_index]
