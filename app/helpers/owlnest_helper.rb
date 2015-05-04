@@ -21,8 +21,8 @@ module OwlnestHelper
   end
 
   def diff_url_for project, id, file_path
-    $DOCKER_CONTAINER_IP ? {host: $DOCKER_CONTAINER_IP } : {}
-    namespace_project_raw_url(project.namespace, project, tree_join(id, file_path),)
+    options = $DOCKER_CONTAINER_IP ? {host: $DOCKER_CONTAINER_IP } : {}
+    namespace_project_raw_url(project.namespace, project, tree_join(id, file_path), options)
   end
 
 end
