@@ -12,6 +12,14 @@ module OwlnestHelper
     end
   end
 
+  def owlnest_entity_class type
+    map_class = {
+      :new_entities => "added",
+      :removed_entities => "removed"
+    }
+    owlnest_action_class(map_class[type])
+  end
+
   def diff_url_for project, id, file_path
     namespace_project_raw_url(project.namespace, project, tree_join(id, file_path))
   end

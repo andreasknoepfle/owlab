@@ -31,3 +31,11 @@ en:
       removed: "Removed"
       modified: "Modified"
       renamed: "Renamed"
+    entities:
+      title: "Entity View"
+      explain: "New, modified and removed entities."
+      name: "entity"
+      types:
+        removed_entities: "Removed"
+        new_entities: "New"
+        modified_entities: "Modified"
