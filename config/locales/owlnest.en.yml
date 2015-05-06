@@ -1,5 +1,8 @@
 en:
   owlnest:
+    binary_identical:
+      title: "Binary identical"
+      notice: "The ontology file contents did not change."
     single_change:
       format_change:
         title: "Ontology Format Change"

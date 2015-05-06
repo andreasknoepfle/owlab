@@ -1,5 +1,5 @@
 class OwlnestController < ApplicationController
-  skip_before_action :authenticate_user!, only: [:diff]
+  skip_before_action :authenticate_user!, only: [:diff,:empty]
   def diff
     @owldiff = Owldiff::Client.diff params[:parent_url], params[:child_url]
     @file_index = params[:file_index]
@@ -7,8 +7,13 @@ class OwlnestController < ApplicationController
   rescue Errno::ECONNREFUSED => e
     @error = "Connection to Owldiff Service could not be established: #{e.message}"
     render :error, layout: !request.xhr?
-  rescue => e
-    @error = e.message
-    render :error, layout: !request.xhr?
+  # rescue => e
+  #   @error = e.message
+  #   render :error, layout: !request.xhr?
   end
+
+  def empty
+    render nothing: true
+  end
+
 end

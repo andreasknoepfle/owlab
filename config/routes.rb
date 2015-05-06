@@ -11,6 +11,7 @@ Gitlab::Application.routes.draw do
 
   #Owlnest
   get "owlnest/diff" => "owlnest#diff"
+  get "owlnest/empty" => "owlnest#empty", as: 'owlnest_empty'
 
   # Autocomplete
   get '/autocomplete/users' => 'autocomplete#users'

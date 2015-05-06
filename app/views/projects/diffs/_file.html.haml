@@ -40,7 +40,8 @@
     - if blob.text?
       - if Owlnest::Owldiff.supported_file?(blob.name)
         - if @commit.parent_id
-          .owlnest_owldiff.ajax_pending{data: { file_index: i, parent_url:  diff_url_for(project,@commit.id, diff_file.file_path), child_url: diff_url_for(project,@commit.parent_id, diff_file.file_path) }}
+          - ontology_urls = ontology_diff_urls_for(project,@commit,diff_file)
+          .owlnest_owldiff.ajax_pending{data: { file_index: i, parent_url: ontology_urls[:parent] , child_url: ontology_urls[:child] }}
             .light-well
               %h4
                 %i.fa.fa-refresh.fa-spin

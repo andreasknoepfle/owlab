@@ -20,9 +20,22 @@ module OwlnestHelper
     owlnest_action_class(map_class[type])
   end
 
-  def diff_url_for project, id, file_path
-    options = $DOCKER_CONTAINER_IP ? {host: $DOCKER_CONTAINER_IP } : {}
-    namespace_project_raw_url(project.namespace, project, tree_join(id, file_path), options)
+  def ontology_diff_urls_for project, commit , diff_file
+    parent_url = diff_file.new_file ? owlnest_empty_url(owlnest_url_options, format: "owl") : ontology_diff_url_for(project, commit.parent_id, diff_file.old_path)
+    child_url = diff_file.deleted_file ? owlnest_empty_url(owlnest_url_options, format: "owl") : ontology_diff_url_for(project, commit.id, diff_file.new_path)
+    {
+      child: child_url,
+      parent: parent_url
+    }
+  end
+
+  def ontology_diff_url_for project, id, file_path
+
+    namespace_project_raw_url(project.namespace, project, tree_join(id, file_path), owlnest_url_options)
+  end
+
+  def owlnest_url_options
+    $DOCKER_CONTAINER_IP ? {host: $DOCKER_CONTAINER_IP } : {}
   end
 
 end
