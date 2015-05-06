@@ -7,9 +7,9 @@ class OwlnestController < ApplicationController
   rescue Errno::ECONNREFUSED => e
     @error = "Connection to Owldiff Service could not be established: #{e.message}"
     render :error, layout: !request.xhr?
-  # rescue => e
-  #   @error = e.message
-  #   render :error, layout: !request.xhr?
+  rescue => e
+    @error = e.message
+    render :error, layout: !request.xhr?
   end
 
   def empty
