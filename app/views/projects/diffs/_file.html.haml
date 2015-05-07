@@ -39,17 +39,17 @@
     - return unless blob.respond_to?('text?')
     - if blob.text?
       - if Owlnest::Owldiff.supported_file?(blob.name)
-          - if @commit.parent_id
-            - ontology_urls = ontology_diff_urls_for(project,@commit,diff_file)
-            .owlnest_owldiff.ajax_pending{data: { file_index: i, parent_url: ontology_urls[:parent] , child_url: ontology_urls[:child] }}
-              .light-well
-                %h4
-                  %i.fa.fa-refresh.fa-spin
-                  %strong Calculating
-                  commit data for ontology diff.
-            =# render "projects/diffs/owldiff", owldiff: owldiff, index: i
-          - elsif !blob.empty?
-            = render 'shared/file_highlight', blob: blob
+        - if @commit.parent_id
+          - ontology_urls = ontology_diff_urls_for(project,@commit,diff_file)
+          .owlnest_owldiff.ajax_pending{data: { file_index: i, parent_url: ontology_urls[:parent] , child_url: ontology_urls[:child] }}
+            .light-well
+              %h4
+                %i.fa.fa-refresh.fa-spin
+                %strong Calculating
+                commit data for ontology diff.
+          =# render "projects/diffs/owldiff", owldiff: owldiff, index: i
+        - elsif !blob.empty?
+          = render 'shared/file_highlight', blob: blob
       - elsif params[:view] == 'parallel'
         = render "projects/diffs/parallel_view", diff_file: diff_file, project: project, blob: blob, index: i
       - else
