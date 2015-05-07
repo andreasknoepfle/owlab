@@ -1,0 +1,94 @@
+.light-well
+  - if @owldiff.binary_identical?
+    .alert.alert-info
+      %h4
+        %i.fa.fa-info
+        =  t("owlnest.binary_identical.title")
+      = t("owlnest.binary_identical.notice")
+  - if @owldiff.format_change
+    .alert.alert-warning
+      %h4
+        %i.fa.fa-exclamation-triangle
+        =  t("owlnest.single_change.format_change.title")
+      = t("owlnest.single_change.format_change.notice", data: @owldiff.format_change.data)
+  - if @owldiff.ontology_id_change
+    .alert.alert-warning
+      %h4
+        %i.fa.fa-exclamation-triangle
+        =  t("owlnest.single_change.ontology_id_change.title")
+      %table
+        - ["ontology_iri","version_iri"].each do |iri|
+          %tr
+            %td= t("owlnest.single_change.ontology_id_change.#{iri}")
+            %td= @owldiff.ontology_id_change.data[iri]
+
+  - Owldiff::OntologyDiff::SET_CHANGE_TYPES.each do |change_type|
+    - changes =  @owldiff.send(change_type)
+    - if changes && !changes.empty?
+      - grouped_changes = changes.group_by{ |change| change.action}.sort
+      .panel.panel-default
+        .panel-heading
+          = t "owlnest.set_changes.#{change_type}.title"
+        .panel-body{:role => "tabpanel"}
+          %p
+            = t "owlnest.set_changes.#{change_type}.explain"
+          %ul.nav.nav-tabs{:role => "tablist"}
+            - grouped_changes.each_with_index do |(action,changes),tab_index|
+              %li{:role => "presentation", class: tab_index==0 ? "active" : ""}
+                %a{"aria-controls" => "#{@file_index}_#{change_type}_#{action}", "data-toggle" => "tab", :href => "##{@file_index}_#{change_type}_#{action}", :role => "tab"}
+                  %strong{class: owlnest_action_class(action)}
+                    = t "owlnest.actions.#{action}"
+                    %span.badge
+                      = pluralize(changes.size, t("owlnest.set_changes.#{change_type}.name"))
+          .tab-content
+            - grouped_changes.each_with_index do |(action,changes),tab_index|
+              .tab-pane{:role => "tabpanel", id: "#{@file_index}_#{change_type}_#{action}", class: tab_index==0 ? "active" : ""}
+                .panel-group{id: "#{@file_index}_#{change_type}_#{action}_panel"}
+                  .pre-scrollable
+                    - changes.sort_by{|change| change.value }.each_with_index do |ochange,change_index|
+                      .panel
+                        .panel-heading
+                          %a{ class: owlnest_action_class(action), "data-toggle" => "collapse", "data-parent" => "##{@file_index}_#{change_type}_#{action}_panel" , "aria-controls" => "#{@file_index}_#{change_type}_#{action}_panel_#{change_index}" , "href" => "##{@file_index}_#{change_type}_#{action}_panel_#{change_index}" }= ochange.value
+                        .panel-collapse.collapse{ id: "#{@file_index}_#{change_type}_#{action}_panel_#{change_index}" , role: "tabpanel"}
+                          .panel-body
+                            - if ochange.data.is_a? String
+                              = ochange.data
+                            - else
+                              %dl.dl-horizontal{style: "margin-bottom:0"}
+                                - ochange.data.each do |k,v|
+                                  %dt
+                                    =k
+                                  %dd
+                                    =v
+  - shown_entity_types = Owldiff::OntologyDiff::ENTITIES.select{|entity_type| @owldiff.send(entity_type) && @owldiff.send(entity_type).any?}
+  - if shown_entity_types.any?
+    .panel.panel-default
+      .panel-heading
+        = t "owlnest.entities.title"
+      .panel-body{:role => "tabpanel"}
+        %p
+          = t "owlnest.entities.explain"
+        %ul.nav.nav-tabs{:role => "tablist"}
+          - shown_entity_types.each_with_index do |entity_type,tab_index|
+            - entities = @owldiff.send(entity_type)
+            - if entities && !entities.empty?
+              %li{:role => "presentation", class: tab_index==0 ? "active" : ""}
+                %a{"aria-controls" => "#{@file_index}_#{entity_type}", "data-toggle" => "tab", :href => "##{@file_index}_#{entity_type}", :role => "tab"}
+                  %strong{class: owlnest_entity_class(entity_type)}
+                    = t "owlnest.entities.types.#{entity_type}"
+                    %span.badge
+                      = pluralize(entities.size, t("owlnest.entities.name"))
+        .tab-content
+          - shown_entity_types.each_with_index do |entity_type,tab_index|
+            - entities = @owldiff.send(entity_type)
+            - if entities && !entities.empty?
+              .tab-pane{:role => "tabpanel", id: "#{@file_index}_#{entity_type}", class: tab_index==0 ? "active" : ""}
+                .panel-group{id: "#{@file_index}_#{entity_type}_panel"}
+                  .pre-scrollable
+                    - entities.sort_by{|entity| entity.short }.each_with_index do |entity,entity_index|
+                      .panel
+                        .panel-heading
+                          %a{ class: owlnest_entity_class(entity_type), "data-toggle" => "collapse", "data-parent" => "##{@file_index}_#{entity_type}_panel" , "aria-controls" => "#{@file_index}_#{entity_type}_panel_#{entity_index}" , "href" => "##{@file_index}_#{entity_type}_panel_#{entity_index}" }= entity.short
+                        .panel-collapse.collapse{ id: "#{@file_index}_#{entity_type}_panel_#{entity_index}" , role: "tabpanel"}
+                          .panel-body
+                            = entity.full

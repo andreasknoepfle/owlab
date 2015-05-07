@@ -8,6 +8,10 @@ Gitlab::Application.routes.draw do
                 authorizations: 'oauth/authorizations'
   end
 
+  #Owlnest
+   get "owlnest/diff" => "owlnest#diff"
+   get "owlnest/empty" => "owlnest#empty", as: 'owlnest_empty'
+
   # Autocomplete
   get '/autocomplete/users' => 'autocomplete#users'
   get '/autocomplete/users/:id' => 'autocomplete#user'

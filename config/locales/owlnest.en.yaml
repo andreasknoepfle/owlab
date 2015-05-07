@@ -1,0 +1,44 @@
+en:
+  owlnest:
+    binary_identical:
+      title: "Binary identical"
+      notice: "The ontology file contents did not change."
+    single_change:
+      format_change:
+        title: "Ontology Format Change"
+        notice: "The format of the ontology has changed to %{data}."
+      ontology_id_change:
+        title: "Ontology ID Change"
+        notice: "The ontology ID has changed."
+        ontology_iri: "Ontology IRI"
+        version_iri: "Version IRI"
+    set_changes:
+      prefix_changes:
+        title: "Prefix Changes"
+        explain: "Ontology prefixes have been changed."
+        name: "prefix"
+      import_changes:
+        title: "Import Changes"
+        explain: "Import declarations have been changed."
+        name: "import"
+      annotation_changes:
+        title: "Annotation Data Changes"
+        name: "annotation"
+        explain: "Annotation data has changed."
+      axiom_changes:
+        title: "Axiom Changes"
+        name: "axiom"
+        explain: "Axoims have been added or removed."
+    actions:
+      added: "Added"
+      removed: "Removed"
+      modified: "Modified"
+      renamed: "Renamed"
+    entities:
+      title: "Entity View"
+      explain: "New, modified and removed entities."
+      name: "entity"
+      types:
+        removed_entities: "Removed"
+        new_entities: "New"
+        modified_entities: "Modified"

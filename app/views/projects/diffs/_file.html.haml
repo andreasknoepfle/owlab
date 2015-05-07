@@ -22,7 +22,7 @@
           %span.file-mode= "#{diff_file.diff.a_mode} → #{diff_file.diff.b_mode}"
 
       .diff-btn-group
-        - if blob.text?
+        - if blob.text? && !Owlnest::Owldiff.supported_file?(blob.name)
           = link_to '#', class: 'js-toggle-diff-comments btn btn-sm active has_tooltip', title: "Toggle comments for this file" do
             %i.fa.fa-comments
           &nbsp;
@@ -38,7 +38,19 @@
     -# Skipp all non non-supported blobs
     - return unless blob.respond_to?('text?')
     - if blob.text?
-      - if params[:view] == 'parallel'
+      - if Owlnest::Owldiff.supported_file?(blob.name)
+          - if @commit.parent_id
+            - ontology_urls = ontology_diff_urls_for(project,@commit,diff_file)
+            .owlnest_owldiff.ajax_pending{data: { file_index: i, parent_url: ontology_urls[:parent] , child_url: ontology_urls[:child] }}
+              .light-well
+                %h4
+                  %i.fa.fa-refresh.fa-spin
+                  %strong Calculating
+                  commit data for ontology diff.
+            =# render "projects/diffs/owldiff", owldiff: owldiff, index: i
+          - elsif !blob.empty?
+            = render 'shared/file_highlight', blob: blob
+      - elsif params[:view] == 'parallel'
         = render "projects/diffs/parallel_view", diff_file: diff_file, project: project, blob: blob, index: i
       - else
         = render "projects/diffs/text_file", diff_file: diff_file, index: i
@@ -47,4 +59,3 @@
       = render "projects/diffs/image", diff_file: diff_file, old_file: old_file, file: blob, index: i
     - else
       .nothing-here-block No preview for this file type
-
